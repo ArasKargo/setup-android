@@ -60795,24 +60795,31 @@
             core.info(`success rename ${from} to ${to}`);
             core.info(`start accept licenses`);
             // https://github.com/actions/toolkit/issues/359 pipes workaround
-            switch (process.platform) {
-                case 'win32':
-                    yield exec.exec(`cmd /c "yes | sdkmanager --licenses"`, [], {
-                        silent: !core.isDebug()
-                    });
-                    break;
-                case 'darwin':
-                    yield exec.exec(`/bin/bash -c "yes | sdkmanager --licenses"`, [], {
-                        silent: !core.isDebug()
-                    });
-                    break;
-                case 'linux':
-                    yield exec.exec(`/bin/bash -c "yes | sdkmanager --licenses"`, [], {
-                        silent: !core.isDebug()
-                    });
-                    break;
-                default:
-                    throw Error(`Unsupported platform: ${process.platform}`);
+            try {
+                switch (process.platform) {
+                    case 'win32':
+                        await exec.exec(`cmd /c "yes | sdkmanager --licenses"`, [], {
+                            silent: !core.isDebug()
+                        });
+                        break;
+                    case 'darwin':
+                        await exec.exec(`/bin/bash -c "yes | sdkmanager --licenses"`, [], {
+                            silent: !core.isDebug()
+                        });
+                        break;
+                    case 'linux':
+                        await exec.exec(`/bin/bash -c "yes | sdkmanager --licenses"`, [], {
+                            silent: !core.isDebug()
+                        });
+                        break;
+                    default:
+                        throw new Error(`Unsupported platform: ${process.platform}`);
+                }
+            } catch (error) {
+                core.setFailed(`Failed to accept licenses: ${error.message}`);
+                // Print additional debug info
+                core.info(`Process platform: ${process.platform}`);
+                core.info(`Error stack: ${error.stack}`);
             }
             core.info(`success accept licenses`);
             core.info(`start install build-tools:${buildToolsVersion} and platform-tools and skd:${sdkVersion}`);
