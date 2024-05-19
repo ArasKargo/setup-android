@@ -16,14 +16,14 @@ export async function installAndroidSdk(
   ndkVersion: string,
   cmakeVersion: string
 ): Promise<void> {
-  await fs.rm(ANDROID_SDK_ROOT, {recursive: true, force: true})
+  await fs.rm(ANDROID_SDK_ROOT, { recursive: true, force: true })
   await fs.rm(path.join(ANDROID_SDK_ROOT, 'cmdline-tools', 'latest'), {
     recursive: true,
     force: true
   })
   core.info(`success cleanup`)
 
-  await fs.mkdir(ANDROID_SDK_ROOT, {recursive: true})
+  await fs.mkdir(ANDROID_SDK_ROOT, { recursive: true })
   core.info(`success create directory`)
 
   let cmdlineToolsDownloadUrl: string
@@ -73,29 +73,29 @@ export async function installAndroidSdk(
   // https://github.com/actions/toolkit/issues/359 pipes workaround
   try {
     switch (process.platform) {
-        case 'win32':
-            await exec.exec(`cmd /c "yes | sdkmanager --licenses"`, [], {
-                silent: !core.isDebug()
-            });
-            break;
-        case 'darwin':
-            await exec.exec(`/bin/bash -c "yes | sdkmanager --licenses"`, [], {
-                silent: !core.isDebug()
-            });
-            break;
-        case 'linux':
-            await exec.exec(`/bin/bash -c "yes | sdkmanager --licenses"`, [], {
-                silent: !core.isDebug()
-            });
-            break;
-        default:
-            throw new Error(`Unsupported platform: ${process.platform}`);
+      case 'win32':
+        yield exec.exec(`cmd /c "yes | sdkmanager --licenses"`, [], {
+          silent: !core.isDebug()
+        });
+        break;
+      case 'darwin':
+        yield exec.exec(`/bin/bash -c "yes | sdkmanager --licenses"`, [], {
+          silent: !core.isDebug()
+        });
+        break;
+      case 'linux':
+        yield exec.exec(`/bin/bash -c "yes | sdkmanager --licenses"`, [], {
+          silent: !core.isDebug()
+        });
+        break;
+      default:
+        throw new Error(`Unsupported platform: ${process.platform}`);
     }
   } catch (error) {
-      core.setFailed(`Failed to accept licenses: ${error.message}`);
-      // Print additional debug info
-      core.info(`Process platform: ${process.platform}`);
-      core.info(`Error stack: ${error.stack}`);
+    core.setFailed(`Failed to accept licenses: ${error.message}`);
+    // Print additional debug info
+    core.info(`Process platform: ${process.platform}`);
+    core.info(`Error stack: ${error.stack}`);
   }
   core.info(`success accept licenses`)
 
@@ -113,7 +113,7 @@ export async function installAndroidSdk(
       ...sdkVersionCommand,
       '--verbose'
     ],
-    {silent: !core.isDebug()}
+    { silent: !core.isDebug() }
   )
   core.info(
     `success install build-tools:${buildToolsVersion} and platform-tools and skd:${sdkVersion}`
